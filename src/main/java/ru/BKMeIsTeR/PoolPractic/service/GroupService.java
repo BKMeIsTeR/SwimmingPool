@@ -3,28 +3,30 @@ package ru.BKMeIsTeR.PoolPractic.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.BKMeIsTeR.PoolPractic.DTO.GroupDto;
+import ru.BKMeIsTeR.PoolPractic.DTO.GroupScheduleDto;
 import ru.BKMeIsTeR.PoolPractic.DTO.InstructorDtoResponse;
-import ru.BKMeIsTeR.PoolPractic.entity.GroupEntity;
-import ru.BKMeIsTeR.PoolPractic.entity.InstructorEntity;
-import ru.BKMeIsTeR.PoolPractic.entity.UserEntity;
-import ru.BKMeIsTeR.PoolPractic.entity.VisitorEntity;
+import ru.BKMeIsTeR.PoolPractic.entity.*;
 import ru.BKMeIsTeR.PoolPractic.exceptions.BaseExteption;
 import ru.BKMeIsTeR.PoolPractic.repository.GroupRepository;
+import ru.BKMeIsTeR.PoolPractic.repository.GroupScheduleRepository;
 import ru.BKMeIsTeR.PoolPractic.repository.InstructorRepository;
 import ru.BKMeIsTeR.PoolPractic.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class GroupService {
     private GroupRepository groupRepository;
     private InstructorRepository instructorRepository;
+    private GroupScheduleRepository groupScheduleRepository;
     private UserRepository userRepository;
 
     @Autowired
-    public GroupService(GroupRepository groupRepository, InstructorRepository instructorRepository, UserRepository userRepository) {
+    public GroupService(GroupRepository groupRepository, InstructorRepository instructorRepository, GroupScheduleRepository groupScheduleRepository, UserRepository userRepository) {
         this.groupRepository = groupRepository;
         this.instructorRepository = instructorRepository;
+        this.groupScheduleRepository = groupScheduleRepository;
         this.userRepository = userRepository;
     }
 
@@ -33,9 +35,7 @@ public class GroupService {
     }
 
     public void addGroup(GroupDto groupDto) {
-        GroupEntity groupEntity = new GroupEntity(groupDto);
-
-        groupRepository.save(groupEntity);
+        groupRepository.save(new GroupEntity(groupDto));
     }
 
     public GroupEntity findGroup(Long id) {
@@ -60,13 +60,12 @@ public class GroupService {
     public void deleteInstructorGroup(Long groupId, Long instructorId) {
         GroupEntity group = groupRepository.findById(groupId).orElseThrow(
                 () -> new BaseExteption("Не удалось найти группу по id = " + groupId));
-//        InstructorEntity instructor = instructorRepository.findById(instructorId).orElseThrow(
-//                () -> new BaseExteption("Не удалось найти инструктора по id = " + instructorId));
 
-        InstructorEntity instructor = group.getInstructorEntity();
+        if (group.getInstructorEntity() == null)
+            throw new BaseExteption("В группе " + group.getName() + " нет инструктора");
 
-        if (instructor.getId() != instructorId)
-            throw new BaseExteption("В данной группе нет такого инструктора");
+        if (group.getInstructorEntity().getId() != instructorId)
+            throw new BaseExteption("В группе " + group.getName() + " нет такого инструктора");
 
         //Установить инструктора в группу
         group.setInstructorEntity(null);
@@ -95,8 +94,7 @@ public class GroupService {
                 throw new BaseExteption("В группе достигнуто максимальное количество посетителей женского пола");
         }
 
-
-        group.addVisitor(visitor);
+        group.getVisitorEntityList().add(visitor);
 
         groupRepository.save(group);
     }
@@ -110,7 +108,7 @@ public class GroupService {
         if (!group.getVisitorEntityList().contains(visitor))
             throw new BaseExteption("Вы не находитесь в данной группе, чтобы СПИСЫВАТЬСЯ С НЕЁ!!!");
 
-        group.removeVisitor(visitor);
+        group.getVisitorEntityList().remove(visitor);
 
         groupRepository.save(group);
     }
@@ -119,17 +117,31 @@ public class GroupService {
         GroupEntity group = groupRepository.findById(groupId).orElseThrow(
                 () -> new BaseExteption("Не удалось найти группу по id = " + groupId));
 
-        group.deleteVisitorAndInstructor();
+        group.getVisitorEntityList().clear();
+        group.getGroupScheduleEntities().clear(); // Добавил только что
+        group.setInstructorEntity(null);
+
+        groupRepository.save(group); //Нужно т.к. иначе ограничение ключа расписания не даст удалить
 
         groupRepository.delete(group);
     }
 
-    public List<InstructorDtoResponse> showInstructorByFilter(Long groupId) {
-        List<InstructorDtoResponse> instructorDtoResponses = instructorRepository.showInstructorByFilter(groupId);
+    public List<InstructorDtoResponse> showInstructorByFilter(Long groupId, int weekNumber) {
+        return instructorRepository.showInstructorByFilter(groupId, weekNumber);
+    }
 
-        if (instructorDtoResponses.isEmpty())
-            throw new BaseExteption("что-то пошло не по плану, но мы обязательно что-нибудь придумаем!");
+    public void addGroupSchedule(Long groupId, GroupScheduleDto groupScheduleDto) {
+        GroupEntity ge = this.findGroup(groupId);
 
-        return instructorDtoResponses;
+        GroupScheduleEntity gse = new GroupScheduleEntity(groupScheduleDto);
+        gse.setGroupEntity(ge);
+
+        ge.getGroupScheduleEntities().add(gse);
+
+        groupRepository.save(ge);
+    }
+
+    public List<GroupScheduleDto> showGroupSchedule(Long groupId) {
+        return groupScheduleRepository.findAllByGroupEntityIdEquals(groupId);
     }
 }

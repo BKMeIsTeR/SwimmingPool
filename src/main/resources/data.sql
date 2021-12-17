@@ -1,0 +1,37 @@
+-- INSERT INTO role (id, name)
+-- VALUES (1, 'ROLE_USER'), (2, 'ROLE_INSTRUCTOR'), (3, 'ROLE_ADMIN');
+
+-- INSERT INTO users(password, user_name, role_id)
+-- VALUES ('$2a$10$IjaDcrDmLpzkX3fzTB.yeue.7GMdmkMkCtdwY2pzHp3q.KjtsPM5S', 'admin', 3);
+--
+-- INSERT INTO public.t_instructor(education, experience, full_name, preferred_time_start, preferred_time_end, work_rate, user_entity_id)
+-- VALUES ('высшее', 5, 'Иванов Иван Иванович', 700, 820, 40, ?),
+-- VALUES ('среднее', 2, 'Евгл Евлампий Евлампеевич', 1000, 1120, 50, ?),
+-- VALUES ('ПТУ', 1, 'Петров Петр Петрович', 740, 800, 20, ?);
+--
+-- INSERT INTO public.t_group(name, preferred_time_start, preferred_time_end, number_men, number_women, instructor_id)
+-- VALUES ('группа1', 720, 850, 0, 2, ?),
+-- VALUES ('группа2', 600, 620, 2, 0, ?),
+-- VALUES ('группа3', 799, 858, 4, 3, ?),
+-- VALUES ('группа4', 1200, 1450, 5, 5, ?);
+--
+-- INSERT INTO public.t_visitor(full_name, email, phone, sex, user_entity_id)
+-- VALUES ('visitor1', 'visitor1@yanex.ru', '89215478254', true, ?),
+-- VALUES ('visitor2', 'visitor2@yanex.ru', '89215478254', true, ?),
+-- VALUES ('visitor3', 'visitor3@yanex.ru', '89215478254', true, ?),
+-- VALUES ('visitor4', 'visitor4@yanex.ru', '89215478254', true, ?),
+-- VALUES ('visitor5', 'visitor5@yanex.ru', '89215478254', true, ?),
+-- VALUES ('visitor6', 'visitor6@yanex.ru', '89215478254', true, ?),
+-- VALUES ('visitor7', 'visitor7@yanex.ru', '89215478254', true, ?),
+-- VALUES ('visitor8', 'visitor8@yanex.ru', '89215478254', true, ?),
+-- VALUES ('visitor9', 'visitor9@yanex.ru', '89215478254', true, ?),
+-- VALUES ('visitor10', 'visitor10@yanex.ru', '89215478254', true, ?),
+-- VALUES ('visitor11', 'visitor11@yanex.ru', '89215478254', false, ?),
+-- VALUES ('visitor12', 'visitor12@yanex.ru', '89215478254', false, ?),
+-- VALUES ('visitor13', 'visitor13@yanex.ru', '89215478254', false, ?),
+-- VALUES ('visitor14', 'visitor14@yanex.ru', '89215478254', false, ?),
+-- VALUES ('visitor15', 'visitor15@yanex.ru', '89215478254', false, ?);
+--
+-- INSERT INTO public.groups_visitors(visitor_id, group_id)
+-- VALUES (?, ?), VALUES (?, ?),VALUES (?, ?), VALUES (?, ?),VALUES (?, ?), VALUES (?, ?),VALUES (?, ?), VALUES (?, ?),
+-- VALUES (?, ?), VALUES (?, ?),VALUES (?, ?), VALUES (?, ?),VALUES (?, ?), VALUES (?, ?),VALUES (?, ?), VALUES (?, ?);

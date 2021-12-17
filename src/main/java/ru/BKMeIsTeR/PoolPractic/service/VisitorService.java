@@ -11,6 +11,10 @@ import ru.BKMeIsTeR.PoolPractic.exceptions.BaseExteption;
 import ru.BKMeIsTeR.PoolPractic.repository.UserRepository;
 import ru.BKMeIsTeR.PoolPractic.repository.VisitorRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class VisitorService {
 
@@ -25,28 +29,16 @@ public class VisitorService {
         this.userRepository = userRepository;
     }
 
-    //Добавить посетителя
+    /**
+     * Регистрация посетителя
+     * @param visitorDto - объект передачи данных посетителя
+     */
     public void addVisitor(VisitorDto visitorDto) {
-        UserEntity userFromDB = userRepository.findByUsername(visitorDto.getUserName()).orElseThrow(
-                () -> new BaseExteption("Пользователь с таким именем уже сущeствует"));
+        if (userRepository.findByUsername(visitorDto.getUserName()).isPresent())
+            throw new BaseExteption("Пользователь с таким именем уже сущeствует");
 
         visitorDto.setPassword(bCryptPasswordEncoder.encode(visitorDto.getPassword()));
 
-        VisitorEntity visitor = new VisitorEntity(visitorDto);
-
-        visitorRepository.save(visitor);
-    }
-
-
-
-
-
-    //Добавить админа в БД
-    public void addAdmin() {
-        UserEntity admin = new UserEntity("admin", bCryptPasswordEncoder.encode("admin"));
-        admin.setUserRole(new RoleEntity(3L, "ROLE_ADMIN"));
-
-        userRepository.save(admin);
+        visitorRepository.save(new VisitorEntity(visitorDto));
     }
 }
-

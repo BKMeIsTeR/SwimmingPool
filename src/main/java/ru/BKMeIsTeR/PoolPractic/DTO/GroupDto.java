@@ -14,10 +14,6 @@ public class GroupDto {
     private int numberMen;
     //Количество женских мест в раздевалке
     private int numberWomen;
-    //Время начала  тренировок
-    private int preferredTimeStart;
-    //Время конца тренировок
-    private int preferredTimeEnd;
 }
 
 

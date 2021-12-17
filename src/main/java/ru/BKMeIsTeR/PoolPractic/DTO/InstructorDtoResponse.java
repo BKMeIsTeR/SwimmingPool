@@ -23,15 +23,10 @@ public class InstructorDtoResponse {
     private int preferredTimeStart;
     //Конец удобного времени тренировок
     private int preferredTimeEnd;
-
-
-
     //Текущая занятость
     private Long currentEmployment;
-    //пересекается ли с желаемым временем инструктора
+    //true - время группы пересекается с удобным временем инструктора, false - нет
     private boolean intersects;
-
-
 
     public InstructorDtoResponse(String fullName, int experience, String education, int workRate,
                                  int preferredTimeStart, int preferredTimeEnd,

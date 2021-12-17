@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.BKMeIsTeR.PoolPractic.DTO.InstructorDto;
+import ru.BKMeIsTeR.PoolPractic.entity.GroupEntity;
 import ru.BKMeIsTeR.PoolPractic.entity.InstructorEntity;
-import ru.BKMeIsTeR.PoolPractic.entity.UserEntity;
 import ru.BKMeIsTeR.PoolPractic.exceptions.BaseExteption;
 import ru.BKMeIsTeR.PoolPractic.repository.InstructorRepository;
 import ru.BKMeIsTeR.PoolPractic.repository.UserRepository;
@@ -26,34 +26,52 @@ public class InstructorService {
         this.instructorRepository = instructorRepository;
     }
 
+    /**
+     * Вывод информации о инструкторе
+     * @return информация о инструкторе
+     */
     public List<InstructorEntity> showAllInstructors() {
         return instructorRepository.findAll();
     }
 
-    public InstructorEntity findInstructorById(Long id) {
-        return instructorRepository.findById(id).orElseThrow(
-                () -> new BaseExteption("Не удалось найти инструктора по id = " + id));
+    /**
+     * Поиск инструктора по Id
+     * @param instructorId - id инструктора
+     * @return информация о инструкторе или сообщение о несуществование искоемого
+     */
+    public InstructorEntity findInstructorById(Long instructorId) {
+        return instructorRepository.findById(instructorId).orElseThrow(
+                () -> new BaseExteption("Не удалось найти инструктора по id = " + instructorId));
     }
 
+    /**
+     * Добавление инструктора
+     * @param instructorDto - объект передачи данных инструктора
+     */
     public void addInstructor(InstructorDto instructorDto) {
-        UserEntity userFromDB = userRepository.findByUsername(instructorDto.getUserName()).orElseThrow(
-                () -> new BaseExteption("Пользователь с таким логином уже существует"));
+        if (userRepository.findByUsername(instructorDto.getUserName()).isPresent())
+            throw new BaseExteption("Пользователь с таким именем уже сущeствует");
 
         instructorDto.setPassword(bCryptPasswordEncoder.encode(instructorDto.getPassword()));
 
-        InstructorEntity instructor = new InstructorEntity(instructorDto);
-
-        instructorRepository.save(instructor);
+        instructorRepository.save(new InstructorEntity(instructorDto));
     }
 
+    /**
+     * Удаление инструктора
+     * @param instructorId - id инструктора
+     */
     public void deleteInstructor(Long instructorId) {
         InstructorEntity instructor = instructorRepository.findById(instructorId).orElseThrow(
                 () -> new BaseExteption("Не удалось найти инструктора с таким id = " + instructorId));
 
-
+        //Если за инструктором закреплены группы, то удаляем зависимости
         if (!instructor.getGroupEntities().isEmpty()) {
 
-            instructor.resetGroups();
+            for (GroupEntity ge : instructor.getGroupEntities())
+                ge.setInstructorEntity(null);
+
+            instructor.getGroupEntities().clear();
 
             instructorRepository.save(instructor);
         }

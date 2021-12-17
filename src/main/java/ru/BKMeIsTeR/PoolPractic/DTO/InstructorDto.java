@@ -7,9 +7,9 @@ import java.time.LocalTime;
 
 import java.time.LocalTime;
 
-@NoArgsConstructor
 @Data
-public class InstructorDto {
+@NoArgsConstructor
+public class InstructorDto extends UserDto {
     //Полное имя
     private String fullName;
     //Опыт работы
@@ -22,13 +22,4 @@ public class InstructorDto {
     private int preferredTimeStart;
     //Конец удобного времени тренировок
     private int preferredTimeEnd;
-
-
-
-    //Имя пользователя
-    private String userName;
-    //Пароль
-    private String password;
-    //Подтверждение пароля
-    private String passwordConfirm;
 }

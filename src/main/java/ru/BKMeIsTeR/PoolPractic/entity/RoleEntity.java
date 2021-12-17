@@ -1,72 +1,27 @@
 package ru.BKMeIsTeR.PoolPractic.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name = "t_role")
+@Table(name = "role")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RoleEntity implements GrantedAuthority {
-
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name")
     private String name;
-
-//    @JsonIgnore
-//    @OneToMany(cascade = CascadeType.ALL
-//            , mappedBy = "userRole")
-//    private Set<UserEntity> usersEntity;
-
-    public RoleEntity() {
-    }
-
-    public RoleEntity(Long id) {
-        this.id = id;
-    }
-
-    public RoleEntity(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-//    public Set<UserEntity> getUsersEntity() {
-//        return usersEntity;
-//    }
-//
-//    public void setUsersEntity(Set<UserEntity> usersEntity) {
-//        this.usersEntity = usersEntity;
-//    }
 
     @Override
     public String getAuthority() {
         return getName();
-    }
-
-    @Override
-    public String toString() {
-        return "RoleEntity{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-//                ", usersEntity=" + usersEntity +
-                '}';
     }
 }

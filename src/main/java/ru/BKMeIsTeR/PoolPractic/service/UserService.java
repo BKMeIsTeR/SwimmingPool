@@ -28,10 +28,8 @@ public class UserService implements UserDetailsService{
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username).orElseThrow(
-                () -> new BaseExteption("Пользовать не найден"));
+    public List<UserEntity> allUsers() {
+        return userRepository.findAll();
     }
 
     public UserEntity findUserById(Long userId) {
@@ -39,27 +37,9 @@ public class UserService implements UserDetailsService{
                 () -> new BaseExteption("Пользователя с таким id не существует"));
     }
 
-    public List<UserEntity> allUsers() {
-        return userRepository.findAll();
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new BaseExteption("Пользовать не найден"));
     }
-
-    public void saveUser(UserEntity user, Long numberRole) {
-        UserEntity userFromDB = userRepository.findByUsername(user.getUsername()).orElseThrow(
-                () -> new BaseExteption("Пользователь с таким логином уже существует"));
-
-        user.setUserRole(new RoleEntity(numberRole, "ROLE_USER"));
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-
-        userRepository.save(user);
-    }
-
-
-
-/*    public boolean deleteUser(Long userId) {
-        if (userRepository.findById(userId).isPresent()) {
-            userRepository.deleteById(userId);
-            return true;
-        }
-        return false;
-    }*/
 }

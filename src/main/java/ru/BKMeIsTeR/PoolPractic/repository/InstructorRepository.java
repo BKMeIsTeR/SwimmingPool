@@ -9,31 +9,18 @@ import ru.BKMeIsTeR.PoolPractic.entity.InstructorEntity;
 import java.util.List;
 
 public interface InstructorRepository extends JpaRepository<InstructorEntity, Long> {
-    @Query(value = "select new ru.BKMeIsTeR.PoolPractic.DTO.InstructorDtoResponse(ie.fullName, ie.experience, " +
-            "ie.education, ie.workRate, ie.preferredTimeStart, ie.preferredTimeEnd, " +
+        @Query(value = "select new ru.BKMeIsTeR.PoolPractic.DTO.InstructorDtoResponse(ie.fullName, ie.experience, " +
+                "ie.education, ie.workRate, ie.preferredTimeStart, ie.preferredTimeEnd, " +
 
-            "(select sum (ge.preferredTimeEnd - ge.preferredTimeStart) FROM GroupEntity ge " +
-            "where ge.instructorEntity.id = ie.id), " +
+        "(select sum (gse.preferredTimeEnd - gse.preferredTimeStart) FROM GroupScheduleEntity gse " +
+        "where gse.groupEntity.instructorEntity.id = ie.id and EXTRACT(WEEK FROM gse.date) = :weekNumber), " +
 
-            "(select count(ge2.id) from GroupEntity ge2 " +
-            "where ge2.id = :group_id " + // and ge2.instructorEntity.id=ie.id " +
-            "and ge2.preferredTimeStart between ie.preferredTimeStart and ie.preferredTimeEnd) " +
+        "(select count(gse2.id) from GroupScheduleEntity gse2 " +
+        "where gse2.groupEntity.id = :group_id " + // and ge2.instructorEntity.id=ie.id " +
+        "and gse2.preferredTimeStart between ie.preferredTimeStart and ie.preferredTimeEnd) " +
 
-            ") from InstructorEntity ie " +
-            "WHERE ie.workRate > (select sum (ge.preferredTimeEnd - ge.preferredTimeStart) FROM GroupEntity ge " +
-            "where ge.instructorEntity.id = ie.id)")
-    List<InstructorDtoResponse> showInstructorByFilter(@Param("group_id") Long groupId);
+        ") from InstructorEntity ie " +
+        "WHERE ie.workRate > (select sum (gse3.preferredTimeEnd - gse3.preferredTimeStart) FROM GroupScheduleEntity gse3 " +
+        "where gse3.groupEntity.instructorEntity.id = ie.id and EXTRACT(WEEK FROM gse3.date) = :weekNumber)")
+         List<InstructorDtoResponse> showInstructorByFilter(@Param("group_id") Long groupId, @Param("weekNumber") int weekNumber);
 }
-
-//@Query("select new ru.BKMeIsTeR.PoolPractic.DTO.InstructorDtoResponse(ie.fullName AS fullName, ie.experience AS experience, " +
-//        "ie.education as education, ie.workRate as workRate, ie.preferredTimeStart as preferredTimeStart, " +
-//        "ie.preferredTimeEnd as preferredTimeStart ," +
-//
-//        "(select sum(ge.preferredTimeEnd-ge.preferredTimeStart) from GroupEntity ge " +
-//        "where ge.instructorEntity.id = ie.id) as currentEmployment, " +
-//
-//        "(select true from GroupEntity ge2 " +
-//        "where ge2.id = :group_id and ge2.instructorEntity.id=ie.id" +
-//        "having ge2.preferredTimeStart between ie.preferredTimeStart and ie.preferredTimeEnd) as intersects" +
-//
-//        ") from InstructorEntity ie")
